@@ -1,9 +1,12 @@
 .DS_Store
 README.md
 flights.csv
+trips
 token.json
 credentials.json
+deepseek.json
 
 bin/
 include/
 lib/
+__pycache__/
