@@ -11,11 +11,14 @@ def save_email_and_create_folder(parent, email, details):
     outbound_date = details.get("outbound_departure_date", None)
     inbound_date = details.get("inbound_departure_date", None)
     
-    if not outbound_date or not inbound_date:
+    if not outbound_date and not inbound_date:
         print("Skipping: Missing flight dates.")
         return
 
-    folder_name = os.path.join(parent, f"{outbound_date} to {inbound_date}")
+    folder_name = os.path.join(parent, 
+        f"{outbound_date} to {inbound_date}" if outbound_date and inbound_date else
+        outbound_date or inbound_date
+    )
     os.makedirs(folder_name, exist_ok=True)
 
     # Save email as text
@@ -108,25 +111,30 @@ def process_flight_emails(parent_directory, query):
         </response>        
         ''' % email['html_body']
 
-        print("Extracting data from", email['subject'], "sent", email['date'])
+        print("%02d." % (len(all_flights) + 1), "Extracting data from", email['subject'], "sent", email['date'])
         result = query_deepseek_json(prompt)
-        print(json.dumps(result, indent=2))
+        # print(json.dumps(result, indent=2))
         
         all_flights.append(result)
         save_email_and_create_folder(parent_directory, email, result)
         append_to_csv(result, parent_directory)
-        break
+        print()
     
     print("Done")
    
 if __name__ == '__main__':
-    process_flight_emails('trips', '''\
+
+    parent_directory = 'trips'
+    email_query = '''\
         (OSL OR Oslo) 
         after:2012/01/01 (
             (from:norwegian.com AND subject:"travel documents") OR 
             (from:flysas.com AND subject:"your flight") OR 
             (from:ba.com AND subject:"e-ticket receipt")
         )'''
-    )
+
+    email_query += '(T59LOO OR TSEKKQ OR 4JHWP6 OR ZEKI6B OR ZEHWAT OR ZEOWFL)'
+
+    process_flight_emails(parent_directory, email_query)
 
 
