@@ -133,8 +133,6 @@ if __name__ == '__main__':
             (from:ba.com AND subject:"e-ticket receipt")
         )'''
 
-    email_query += '(T59LOO OR TSEKKQ OR 4JHWP6 OR ZEKI6B OR ZEHWAT OR ZEOWFL)'
-
     process_flight_emails(parent_directory, email_query)
 
 
