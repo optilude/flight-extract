@@ -1,13 +1,11 @@
 .DS_Store
-README.md
-flights.csv
 trips
 token.json
 credentials.json
 deepseek.json
+email-query.txt
 
 bin/
 include/
 lib/
 __pycache__/
-email-query.txt
