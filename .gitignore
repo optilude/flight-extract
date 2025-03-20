@@ -3,6 +3,7 @@ trips
 token.json
 credentials.json
 deepseek.json
+flickr.json
 email-query.txt
 
 bin/
