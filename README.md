@@ -17,6 +17,7 @@ after:2012/01/01 (
 
 - credentials.json: downloaded from Google API console
 - deepseek.json: `{"apiKey": "<key>"}`
+- flickr.json: `{"apiKey": "<key>", "apiSecret": "<secret>"}`
 
 # Gmail API setup
 
