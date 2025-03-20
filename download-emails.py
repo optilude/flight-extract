@@ -7,6 +7,25 @@ import argparse  # Added for command-line argument parsing
 from gmail import Gmail
 from llm import query_deepseek_json
 
+# Used to illustrate to the LLM what the response should look like
+RESPONSE_SCHEMA = {
+    "booking_reference": "ABCD",
+    "outbound_flight_number": "AB1234",
+    "outbound_departure_date": "2025-01-11",
+    "outbound_departure_time": "10:30",
+    "outbound_departure_airport": "London-Gatwick",
+    "outbound_arrival_date": "2025-01-11",
+    "outbound_arrival_time": "11:40",
+    "outbound_arrival_airport": "Oslo-Gardermoen",
+    "inbound_flight_number": "AB4321",
+    "inbound_departure_date": "2025-02-22",
+    "inbound_departure_time": "12:30",
+    "inbound_departure_airport": "Oslo-Gardermoen",
+    "inbound_arrival_date": "2025-02-22",
+    "inbound_arrival_time": "13:45",
+    "inbound_arrival_airport": "London-Gatwick"
+}
+
 def save_email_and_create_folder(parent, email, details):
     """Creates a folder for the trip and saves the email inside it."""
     
@@ -86,32 +105,16 @@ def process_flight_emails(parent_directory, query):
         email_data = gmail.get_email(msg['id'])
         email = gmail.extract_email_content(email_data)
 
-        prompt = '''
+        prompt = f'''
         You are a professional data extraction tool. Your task is to carefully analyse the provided <email> and extract the
         requested information as reported into the <response> tag. You must return a valid JSON data structure.
         <email>
-        %s
+        {email["html_body"]}
         </email>
         <response>
-        {
-        "booking_reference": "ABCD",
-        "outbound_flight_number": "AB1234",
-        "outbound_departure_date": "2025-01-11",
-        "outbound_departure_time": "10:30",
-        "outbound_departure_airport": "London-Gatwick",
-        "outbound_arrival_date": "2025-01-11",
-        "outbound_arrival_time": "11:40",
-        "outbound_arrival_airport": "Oslo-Gardermoen",
-        "inbound_flight_number": "AB4321",
-        "inbound_departure_date": "2025-02-22",
-        "inbound_departure_time": "12:30",
-        "inbound_departure_airport": "Oslo-Gardermoen",
-        "inbound_arrival_date": "2025-02-22",
-        "inbound_arrival_time": "13:45",
-        "inbound_arrival_airport": "London-Gatwick"
-        }
+        {json.dumps(RESPONSE_SCHEMA, indent=2)}
         </response>        
-        ''' % email['html_body']
+        '''
 
         print("%02d." % (len(all_flights) + 1), "Extracting data from", email['subject'], "sent", email['date'])
         result = query_deepseek_json(prompt)
