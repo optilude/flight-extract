@@ -1,6 +1,8 @@
+#!/bin/env python3
 import os
 import csv
 import json
+import argparse  # Added for command-line argument parsing
 
 from gmail import Gmail
 from llm import query_deepseek_json
@@ -122,17 +124,36 @@ def process_flight_emails(parent_directory, query):
     
     print("Done")
    
-if __name__ == '__main__':
+def main():
+    """Main function to process flight emails."""
+    parser = argparse.ArgumentParser(description="Process flight emails and save details.")
+    parser.add_argument(
+        '--parent-directory', 
+        type=str, 
+        default='trips', 
+        help="Parent directory to save extracted flight details (default: 'trips')"
+    )
+    parser.add_argument(
+        '--query-file', 
+        type=str, 
+        default='email-query.txt', 
+        help="File containing the email query (default: 'email-query.txt')"
+    )
+    args = parser.parse_args()
 
-    parent_directory = 'trips'
-    email_query = '''\
-        (OSL OR Oslo) 
-        after:2012/01/01 (
-            (from:norwegian.com AND subject:"travel documents") OR 
-            (from:flysas.com AND subject:"your flight") OR 
-            (from:ba.com AND subject:"e-ticket receipt")
-        )'''
+    parent_directory = args.parent_directory
+    query_file = args.query_file
+
+    # Load email query from file
+    if not os.path.exists(query_file):
+        raise FileNotFoundError(f"Query file '{query_file}' not found in the current directory.")
+    
+    with open(query_file, 'r', encoding='utf-8') as f:
+        email_query = f.read().strip()
 
     process_flight_emails(parent_directory, email_query)
+
+if __name__ == '__main__':
+    main()
 
 
