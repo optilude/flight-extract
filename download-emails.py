@@ -43,22 +43,29 @@ def save_email_and_create_folder(parent, email, details):
     os.makedirs(folder_name, exist_ok=True)
 
     # Save email as text
-    email_filename = os.path.join(folder_name, "flight_confirmation.txt")
-    with open(email_filename, "w", encoding="utf-8") as f:
+    text_email_filename = os.path.join(folder_name, "flight_confirmation.txt")
+    with open(text_email_filename, "w", encoding="utf-8") as f:
         f.write("Subject: %s\n" % email['subject'])
         f.write("From: %s\n" % email['sender'])
         f.write("Date: %s\n" % email['date'])
         f.write("\n")
         f.write(email['plain_body'] + '\n')
-        f.write("\n")
-        f.write(email['html_body'] + '\n')
+
+    html_email_filename = os.path.join(folder_name, "flight_confirmation.html")
+    with open(html_email_filename, "w", encoding="utf-8") as f:
+        f.write(email['html_body'])
     
     # Save extracted data as JSON
     json_filename = os.path.join(folder_name, "flight_confirmation.json")
     with open(json_filename, "w", encoding="utf-8") as f:
-        f.write(json.dumps(details, indent=2))
+        f.write(json.dumps({
+            'subject': email['subject'],
+            'sender': email['sender'],
+            'date': email['date'],
+            **details
+        }, indent=2))
     
-    print(f"Saved email to {email_filename}")
+    print(f"Saved email and details in: {folder_name}")
 
 def append_to_csv(details, parent, filename='trips.csv'):
     """Stores extracted flight details in a CSV file."""
